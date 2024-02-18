@@ -16,3 +16,13 @@ export class CreateUserDto {
   @MaxLength(22)
   password: string;
 }
+
+export class LoginDto {
+  @ApiProperty({ type: String })
+  @IsString()
+  username: string;
+
+  @ApiProperty({ type: String })
+  @IsString()
+  password: string;
+}
