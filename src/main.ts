@@ -10,7 +10,6 @@ async function bootstrap() {
     .setTitle('Chat nestjs system')
     .setDescription('Chat nestjs system API')
     .setVersion('1.0')
-    .addTag('chat')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);

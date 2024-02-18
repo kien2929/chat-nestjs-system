@@ -14,7 +14,8 @@ export class MessageService {
       .limit(query.pageSize)
       .sort({ _id: -1 })
       .skip(query.pageSize * query.pageNumber)
-      .exec();
+      .exec()
+      .then((res) => res.reverse());
   }
 
   create(body: CreateMessageDto) {
