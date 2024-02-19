@@ -16,9 +16,9 @@ export class User {
   @Prop({ required: true })
   password: string;
 
-  async validatePassword(password: string) {
-    return true;
-  }
+  login: (user: User, password: string) => Promise<object>;
+
+  validatePassword: (password: string) => Promise<boolean>;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
@@ -36,4 +36,16 @@ UserSchema.pre('save', async function (next: any) {
 
 UserSchema.methods.validatePassword = async function (password: string) {
   return bcrypt.compareSync(password, this.password);
+};
+
+UserSchema.methods.login = async function (user: User, password: string) {
+  const isMatch = user && (await user.validatePassword(password));
+  if (!isMatch) {
+    throw new HttpException(
+      'Username or password is incorrect',
+      HttpStatus.BAD_REQUEST,
+    );
+  }
+  user.password = undefined;
+  return user;
 };

@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
-import { UserModule } from './user/user.module';
-import { MessageModule } from './message/message.module';
+import { UserModule } from './modules/user/user.module';
+import { MessageModule } from './modules/message/message.module';
 
 @Module({
   imports: [
