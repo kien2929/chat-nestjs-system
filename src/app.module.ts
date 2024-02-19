@@ -3,6 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './modules/user/user.module';
 import { MessageModule } from './modules/message/message.module';
+import { GroupModule } from './modules/group/group.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { MessageModule } from './modules/message/message.module';
     }),
     UserModule,
     MessageModule,
+    GroupModule,
   ],
   controllers: [],
   providers: [],

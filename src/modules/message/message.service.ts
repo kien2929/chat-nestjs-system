@@ -6,7 +6,7 @@ import { InjectModel } from '@nestjs/mongoose';
 
 @Injectable()
 export class MessageService {
-  constructor(@InjectModel('Message') private messageModel: Model<Message>) {}
+  constructor(@InjectModel('message') private messageModel: Model<Message>) {}
 
   getPaging(query: GetPagingMessageQueryDto) {
     return this.messageModel
