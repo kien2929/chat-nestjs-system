@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
-import { DocumentBase } from 'src/common/model/mongo.model';
+import { DocumentBase } from '../../../common/model/mongo.model';
 
 export class MessageModelResponse extends DocumentBase {
   @ApiProperty({ type: String })

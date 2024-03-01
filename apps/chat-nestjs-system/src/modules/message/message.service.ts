@@ -1,6 +1,6 @@
 import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
-import { Message } from 'src/common/schemas/message.schema';
+import { Message } from '../../common/schemas/message.schema';
 import { CreateMessageDto, GetPagingMessageQueryDto } from './dto/message.dto';
 import { InjectModel } from '@nestjs/mongoose';
 
