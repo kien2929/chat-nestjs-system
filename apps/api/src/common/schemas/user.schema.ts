@@ -24,7 +24,7 @@ export class User {
 export const UserSchema = SchemaFactory.createForClass(User);
 
 UserSchema.pre('save', async function (next: any) {
-  const userExisted = await this.model('User')
+  const userExisted = await this.model('user')
     .findOne({ username: this.username })
     .exec();
   this.password = await bcrypt.hashSync(this.password, 10);
@@ -46,6 +46,5 @@ UserSchema.methods.login = async function (user: User, password: string) {
       HttpStatus.BAD_REQUEST,
     );
   }
-  user.password = undefined;
   return user;
 };

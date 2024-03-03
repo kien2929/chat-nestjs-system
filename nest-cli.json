@@ -1,23 +1,23 @@
 {
   "collection": "@nestjs/schematics",
-  "sourceRoot": "apps/chat-nestjs-system/src",
+  "sourceRoot": "apps/api/src",
   "compilerOptions": {
     "plugins": [
       "@nestjs/swagger"
     ],
     "webpack": true,
-    "tsConfigPath": "apps/chat-nestjs-system/tsconfig.app.json"
+    "tsConfigPath": "apps/api/tsconfig.app.json"
   },
   "monorepo": true,
-  "root": "apps/chat-nestjs-system",
+  "root": "apps/api",
   "projects": {
-    "chat-nestjs-system": {
+    "api": {
       "type": "application",
-      "root": "apps/chat-nestjs-system",
+      "root": "apps/api",
       "entryFile": "main",
-      "sourceRoot": "apps/chat-nestjs-system/src",
+      "sourceRoot": "apps/api/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/chat-nestjs-system/tsconfig.app.json"
+        "tsConfigPath": "apps/api/tsconfig.app.json"
       }
     },
     "auth": {

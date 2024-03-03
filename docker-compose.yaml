@@ -3,10 +3,21 @@ version: '3.1'
 services:
   mongo:
     image: mongo
-    restart: always
+    container_name: mongo
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME:-root}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-example}
       MONGO_INITDB_DATABASE: cns
     ports:
       - 27017:27017
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    hostname: rabbitmq
+    volumes:
+      - /var/lib/rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
+    env_file:
+      - .env
