@@ -3,7 +3,6 @@ import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { CreateUserDto, LoginDto } from './dto/user.dto';
 import { UserResponse } from './model/user.model';
-import { instanceToPlain } from 'class-transformer';
 import { ClientProxy } from '@nestjs/microservices';
 
 @ApiTags('user')
@@ -15,9 +14,10 @@ export class UserController {
   ) {}
 
   @Post()
-  @ApiCreatedResponse({ type: UserResponse })
-  async create(@Body() body: CreateUserDto) {
-    return this.userService.register(body);
+  // @ApiCreatedResponse({ type: UserResponse })
+  // async create(@Body() body: CreateUserDto) {
+  async create() {
+    return this.authService.send({ cmd: 'post-user' }, {});
   }
 
   @Post('login')
