@@ -14,8 +14,6 @@ export class UserController {
   ) {}
 
   @Post()
-  // @ApiCreatedResponse({ type: UserResponse })
-  // async create(@Body() body: CreateUserDto) {
   async create() {
     return this.authService.send({ cmd: 'post-user' }, {});
   }
