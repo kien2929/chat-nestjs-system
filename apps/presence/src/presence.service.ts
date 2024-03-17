@@ -5,4 +5,8 @@ export class PresenceService {
   getHello(): string {
     return 'Hello World!';
   }
+
+  getPresence() {
+    return 'Hello World!';
+  }
 }

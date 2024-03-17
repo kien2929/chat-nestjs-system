@@ -11,6 +11,7 @@ export class UserController {
   constructor(
     private userService: UserService,
     @Inject('AUTH_SERVICE') private authService: ClientProxy,
+    @Inject('PRESENCE_SERVICE') private presenceService: ClientProxy,
   ) {}
 
   @Post()
@@ -26,5 +27,10 @@ export class UserController {
   @Get()
   async getUser() {
     return this.authService.send({ cmd: 'get-user' }, {});
+  }
+
+  @Get('/presence')
+  async getPresence() {
+    return this.presenceService.send({ cmd: 'get-presence' }, {});
   }
 }
