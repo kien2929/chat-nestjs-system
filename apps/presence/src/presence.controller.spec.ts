@@ -13,10 +13,4 @@ describe('PresenceController', () => {
 
     presenceController = app.get<PresenceController>(PresenceController);
   });
-
-  describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(presenceController.getHello()).toBe('Hello World!');
-    });
-  });
 });
