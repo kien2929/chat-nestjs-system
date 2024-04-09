@@ -1,8 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { SharedModule } from '@app/shared';
-import { PostGresDBModule } from '@app/shared/postgresdb.module';
+import { SharedModule, PostGresDBModule } from '@app/shared';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { UserEntity } from './models/user.entity';

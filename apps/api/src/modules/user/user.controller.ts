@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Inject, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { UserService } from './user.service';
-import { LoginDto } from './dto/user.dto';
+import { CreateUserDto, LoginDto } from './dto/user.dto';
 import { ClientProxy } from '@nestjs/microservices';
 
 @ApiTags('user')
@@ -13,9 +13,9 @@ export class UserController {
     @Inject('PRESENCE_SERVICE') private presenceService: ClientProxy,
   ) {}
 
-  @Post()
-  async create() {
-    return this.authService.send({ cmd: 'post-user' }, {});
+  @Post('register')
+  async create(@Body() createUserDto: CreateUserDto) {
+    return this.authService.send({ cmd: 'post-user' }, { ...createUserDto });
   }
 
   @Post('login')

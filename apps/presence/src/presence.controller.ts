@@ -1,7 +1,6 @@
 import { Controller } from '@nestjs/common';
 import { Ctx, MessagePattern, RmqContext } from '@nestjs/microservices';
-import { SharedService } from '@app/shared';
-import { AuthGuard } from '@app/shared/auth.guard';
+import { SharedService, AuthGuard } from '@app/shared';
 import { PresenceService } from './presence.service';
 
 @Controller()

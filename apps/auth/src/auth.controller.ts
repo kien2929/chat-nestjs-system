@@ -1,7 +1,13 @@
 import { Controller } from '@nestjs/common';
-import { Ctx, MessagePattern, RmqContext } from '@nestjs/microservices';
+import {
+  Ctx,
+  MessagePattern,
+  Payload,
+  RmqContext,
+} from '@nestjs/microservices';
 import { SharedService } from '@app/shared';
 import { AuthService } from './auth.service';
+import { CreateUserDto } from 'apps/api/src/modules/user/dto/user.dto';
 
 @Controller()
 export class AuthController {
@@ -18,9 +24,12 @@ export class AuthController {
   }
 
   @MessagePattern({ cmd: 'post-user' })
-  async postUser(@Ctx() context: RmqContext) {
+  async postUser(
+    @Ctx() context: RmqContext,
+    @Payload() newUser: CreateUserDto,
+  ) {
     this.sharedService.acknowledgeMessage(context);
 
-    return this.authService.postUser();
+    return this.authService.registerUser(newUser);
   }
 }
