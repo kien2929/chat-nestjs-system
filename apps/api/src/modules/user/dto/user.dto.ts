@@ -32,10 +32,12 @@ export class CreateUserDto {
 
 export class LoginDto {
   @ApiProperty({ type: String })
-  @IsString()
-  username: string;
+  @IsEmail()
+  @IsNotEmpty()
+  email: string;
 
   @ApiProperty({ type: String })
   @IsString()
+  @IsNotEmpty()
   password: string;
 }

@@ -1,14 +1,13 @@
-import { Body, Controller, Get, Inject, Post } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Post, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { UserService } from './user.service';
 import { CreateUserDto, LoginDto } from './dto/user.dto';
 import { ClientProxy } from '@nestjs/microservices';
+import { AuthGuard } from '@app/shared';
 
 @ApiTags('user')
 @Controller('user')
 export class UserController {
   constructor(
-    private userService: UserService,
     @Inject('AUTH_SERVICE') private authService: ClientProxy,
     @Inject('PRESENCE_SERVICE') private presenceService: ClientProxy,
   ) {}
@@ -19,8 +18,8 @@ export class UserController {
   }
 
   @Post('login')
-  async login(@Body() body: LoginDto) {
-    return this.userService.login(body);
+  async login(@Body() loginDto: LoginDto) {
+    return this.authService.send({ cmd: 'login' }, loginDto);
   }
 
   @Get()
@@ -28,7 +27,8 @@ export class UserController {
     return this.authService.send({ cmd: 'get-user' }, {});
   }
 
-  @Get('/presence')
+  @UseGuards(AuthGuard)
+  @Get('presence')
   async getPresence() {
     return this.presenceService.send({ cmd: 'get-presence' }, {});
   }

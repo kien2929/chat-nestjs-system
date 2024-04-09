@@ -10,6 +10,7 @@ import { AuthGuard } from './auth.guard';
       isGlobal: true,
       envFilePath: './.env',
     }),
+    SharedModule.RegisterRmq('AUTH_SERVICE', process.env.RABBITMQ_AUTH_QUEUE),
   ],
   providers: [SharedService, AuthGuard],
   exports: [SharedService, AuthGuard],

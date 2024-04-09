@@ -1,15 +1,24 @@
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { ConflictException, Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import {
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './models/user.entity';
-import { CreateUserDto } from 'apps/api/src/modules/user/dto/user.dto';
+import {
+  CreateUserDto,
+  LoginDto,
+} from 'apps/api/src/modules/user/dto/user.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
+    private readonly jwtService: JwtService,
   ) {}
 
   async getUsers() {
@@ -25,6 +34,29 @@ export class AuthService {
 
   async hashPassword(password: string): Promise<string> {
     return bcrypt.hash(password, 12);
+  }
+
+  async comparePassword(
+    password: string,
+    hashedPassword: string,
+  ): Promise<boolean> {
+    return bcrypt.compare(password, hashedPassword);
+  }
+
+  async validUser(email: string, password: string): Promise<boolean> {
+    const user = await this.findByEmail(email);
+    if (!user) {
+      return false;
+    }
+    const isValidPassword = await this.comparePassword(password, user.password);
+    if (!isValidPassword) {
+      return false;
+    }
+    return true;
+  }
+
+  async generateJwt(payload): Promise<string> {
+    return this.jwtService.signAsync(payload);
   }
 
   async registerUser(user: Readonly<CreateUserDto>): Promise<UserEntity> {
@@ -45,5 +77,32 @@ export class AuthService {
     delete createdUser.password;
 
     return createdUser;
+  }
+
+  async login(loginPayload: LoginDto) {
+    const { email, password } = loginPayload;
+    const isValidUser = await this.validUser(email, password);
+
+    if (!isValidUser) {
+      throw new UnauthorizedException();
+    }
+
+    const jwt = await this.generateJwt({ email });
+
+    return { token: jwt };
+  }
+
+  async verifyJwt(jwt: string): Promise<{ user: UserEntity }> {
+    if (!jwt) {
+      throw new UnauthorizedException();
+    }
+    try {
+      const decoded = await this.jwtService.verifyAsync(jwt);
+      const user = await this.findByEmail(decoded.email);
+      delete user.password;
+      return { user };
+    } catch (error) {
+      throw new UnauthorizedException();
+    }
   }
 }
