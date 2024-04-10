@@ -1,32 +1,32 @@
-import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import {
   ConflictException,
+  Inject,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { UserEntity } from './models/user.entity';
 import {
   CreateUserDto,
   LoginDto,
 } from 'apps/api/src/modules/user/dto/user.dto';
+import { UserRepositoryInterface, UserEntity } from '@app/shared';
+import { AuthServiceInterface } from './interface/auth.service.interface';
 
 @Injectable()
-export class AuthService {
+export class AuthService implements AuthServiceInterface {
   constructor(
-    @InjectRepository(UserEntity)
-    private readonly userRepository: Repository<UserEntity>,
+    @Inject('UserRepositoryInterface')
+    private readonly userRepository: UserRepositoryInterface,
     private readonly jwtService: JwtService,
   ) {}
 
   async getUsers() {
-    return this.userRepository.find();
+    return this.userRepository.findAll();
   }
 
   async findByEmail(email: string): Promise<UserEntity> {
-    return this.userRepository.findOne({
+    return this.userRepository.findByCondition({
       where: { email },
       select: ['id', 'email', 'password', 'firstName', 'lastName'],
     });
@@ -55,7 +55,7 @@ export class AuthService {
     return true;
   }
 
-  async generateJwt(payload): Promise<string> {
+  async generateJwt(payload: any): Promise<string> {
     return this.jwtService.signAsync(payload);
   }
 
@@ -79,7 +79,7 @@ export class AuthService {
     return createdUser;
   }
 
-  async login(loginPayload: LoginDto) {
+  async login(loginPayload: LoginDto): Promise<{ token: string }> {
     const { email, password } = loginPayload;
     const isValidUser = await this.validUser(email, password);
 

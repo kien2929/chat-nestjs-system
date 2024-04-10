@@ -1,11 +1,16 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { SharedModule, PostGresDBModule } from '@app/shared';
+import { JwtModule } from '@nestjs/jwt';
+import {
+  SharedModule,
+  PostGresDBModule,
+  SharedService,
+  UserEntity,
+  UserRepository,
+} from '@app/shared';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { UserEntity } from './models/user.entity';
-import { JwtModule } from '@nestjs/jwt';
 import { JwtGuard } from './jwt.guard';
 import { JwtStrategy } from './jwt-strategy';
 
@@ -33,6 +38,21 @@ import { JwtStrategy } from './jwt-strategy';
     TypeOrmModule.forFeature([UserEntity]),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtGuard, JwtStrategy],
+  providers: [
+    {
+      provide: 'AuthServiceInterface',
+      useClass: AuthService,
+    },
+    {
+      provide: 'UserRepositoryInterface',
+      useClass: UserRepository,
+    },
+    {
+      provide: 'SharedServiceInterface',
+      useClass: SharedService,
+    },
+    JwtGuard,
+    JwtStrategy,
+  ],
 })
 export class AuthModule {}
