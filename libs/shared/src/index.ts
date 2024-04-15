@@ -1,7 +1,10 @@
-export * from './shared.module';
-export * from './shared.service';
-export * from './auth.guard';
-export * from './postgresdb.module';
+// modules
+export * from './modules/shared.module';
+export * from './modules/postgresdb.module';
+//services
+export * from './services/shared.service';
+// guards
+export * from './guards/auth.guard';
 // interface
 export * from './repositories/base/base.interface.repository';
 export * from './interfaces/user.repository';
