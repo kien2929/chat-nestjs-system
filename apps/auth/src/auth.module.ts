@@ -8,6 +8,8 @@ import {
   SharedService,
   UserEntity,
   UserRepository,
+  FriendRequestRepository,
+  FriendRequestEntity,
 } from '@app/shared';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
@@ -23,7 +25,7 @@ import { JwtStrategy } from './jwt-strategy';
     JwtModule.register({
       global: true,
       secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '60s' },
+      signOptions: { expiresIn: '900s' },
     }),
     SharedModule,
     PostGresDBModule,
@@ -35,7 +37,7 @@ import { JwtStrategy } from './jwt-strategy';
       }),
       inject: [ConfigService],
     }),
-    TypeOrmModule.forFeature([UserEntity]),
+    TypeOrmModule.forFeature([UserEntity, FriendRequestEntity]),
   ],
   controllers: [AuthController],
   providers: [
@@ -46,6 +48,10 @@ import { JwtStrategy } from './jwt-strategy';
     {
       provide: 'UserRepositoryInterface',
       useClass: UserRepository,
+    },
+    {
+      provide: 'FriendRequestRepositoryInterface',
+      useClass: FriendRequestRepository,
     },
     {
       provide: 'SharedServiceInterface',

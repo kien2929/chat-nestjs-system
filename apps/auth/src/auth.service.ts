@@ -10,14 +10,22 @@ import {
   CreateUserDto,
   LoginDto,
 } from 'apps/api/src/modules/user/dto/user.dto';
-import { UserRepositoryInterface, UserEntity } from '@app/shared';
+import {
+  UserJwt,
+  UserEntity,
+  UserRepositoryInterface,
+  FriendRequestRepositoryInterface,
+} from '@app/shared';
 import { AuthServiceInterface } from './interface/auth.service.interface';
+import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
 export class AuthService implements AuthServiceInterface {
   constructor(
     @Inject('UserRepositoryInterface')
     private readonly userRepository: UserRepositoryInterface,
+    @Inject('FriendRequestRepositoryInterface')
+    private readonly friendRequestRepository: FriendRequestRepositoryInterface,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -43,16 +51,16 @@ export class AuthService implements AuthServiceInterface {
     return bcrypt.compare(password, hashedPassword);
   }
 
-  async validUser(email: string, password: string): Promise<boolean> {
+  async validUser(email: string, password: string): Promise<UserEntity> {
     const user = await this.findByEmail(email);
     if (!user) {
-      return false;
+      return null;
     }
     const isValidPassword = await this.comparePassword(password, user.password);
-    if (!isValidPassword) {
-      return false;
-    }
-    return true;
+
+    if (!isValidPassword) return null;
+
+    return user;
   }
 
   async generateJwt(payload: any): Promise<string> {
@@ -64,7 +72,7 @@ export class AuthService implements AuthServiceInterface {
     const existedUser = await this.findByEmail(email);
 
     if (existedUser) {
-      throw new ConflictException('Email already exists');
+      throw new RpcException(new ConflictException('Email already exists'));
     }
 
     const hashedPassword = await this.hashPassword(password);
@@ -81,28 +89,75 @@ export class AuthService implements AuthServiceInterface {
 
   async login(loginPayload: LoginDto): Promise<{ token: string }> {
     const { email, password } = loginPayload;
-    const isValidUser = await this.validUser(email, password);
+    const user = await this.validUser(email, password);
 
-    if (!isValidUser) {
-      throw new UnauthorizedException();
+    if (!user) {
+      throw new RpcException(new UnauthorizedException());
     }
-
-    const jwt = await this.generateJwt({ email });
+    delete user.password;
+    const jwt = await this.generateJwt({ user });
 
     return { token: jwt };
   }
 
-  async verifyJwt(jwt: string): Promise<{ user: UserEntity }> {
+  async verifyJwt(jwt: string): Promise<{ user: UserEntity; exp: number }> {
     if (!jwt) {
-      throw new UnauthorizedException();
+      throw new RpcException(new UnauthorizedException());
     }
     try {
-      const decoded = await this.jwtService.verifyAsync(jwt);
-      const user = await this.findByEmail(decoded.email);
-      delete user.password;
-      return { user };
+      const { user, exp } = await this.jwtService.verifyAsync(jwt);
+      return { user, exp };
     } catch (error) {
-      throw new UnauthorizedException();
+      throw new RpcException(new UnauthorizedException());
     }
+  }
+
+  async getUserFromHeader(jwt: string): Promise<UserJwt> {
+    if (!jwt) {
+      throw new RpcException(new UnauthorizedException());
+    }
+    try {
+      return this.jwtService.decode(jwt) as UserJwt;
+    } catch (error) {
+      throw new RpcException(new UnauthorizedException());
+    }
+  }
+
+  async findUserById(userId: number): Promise<UserEntity> {
+    return this.userRepository.findOneById(userId);
+  }
+
+  async addFriend(userId: number, friendId: number) {
+    const creator = await this.findUserById(userId);
+    const receiver = await this.findUserById(friendId);
+
+    if (!creator || !receiver) {
+      throw new RpcException(new ConflictException('User not found'));
+    }
+
+    const existedFriendRequest =
+      await this.friendRequestRepository.findByCondition({
+        where: { creator, receiver },
+      });
+
+    if (existedFriendRequest) {
+      throw new RpcException(new ConflictException('Existed friend request'));
+    }
+
+    const createdRequest = this.friendRequestRepository.save({
+      creator,
+      receiver,
+    });
+
+    return createdRequest;
+  }
+
+  async getFriends(userId: number) {
+    const creator = await this.findUserById(userId);
+
+    return this.friendRequestRepository.findWithRelations({
+      where: [{ creator }, { receiver: creator }],
+      relations: ['creator', 'receiver'],
+    });
   }
 }

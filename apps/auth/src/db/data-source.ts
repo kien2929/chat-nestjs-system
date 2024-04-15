@@ -1,10 +1,10 @@
 import { DataSource, DataSourceOptions } from 'typeorm';
-import { UserEntity } from '../models/user.entity';
+import { UserEntity, FriendRequestEntity } from '@app/shared';
 
 export const dataSourceOption: DataSourceOptions = {
   type: 'postgres',
   url: process.env.POSTGRES_URI,
-  entities: [UserEntity],
+  entities: [UserEntity, FriendRequestEntity],
   migrations: ['dist/apps/auth/db/migrations/*.js'],
 };
 

@@ -33,7 +33,7 @@ export class AuthGuard implements CanActivate {
     return this.authService.send({ cmd: 'verify-jwt' }, { jwt }).pipe(
       switchMap(({ user }) => {
         if (!user) return of(false);
-        console.log({ user });
+
         return of(user);
       }),
       catchError(() => {
