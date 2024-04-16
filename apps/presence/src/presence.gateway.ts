@@ -12,8 +12,9 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 
-import { FriendRequestEntity, UserJwt } from '@app/shared';
+import { UserJwt } from '@app/shared';
 import { ActiveUser } from './interfaces/active-user.interface';
+import { PresenceService } from './presence.service';
 
 @WebSocketGateway({ cors: true })
 export class PresenceGateway
@@ -22,36 +23,11 @@ export class PresenceGateway
   constructor(
     @Inject('AUTH_SERVICE') private readonly authService: ClientProxy,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
+    private readonly presenceService: PresenceService,
   ) {}
 
   @WebSocketServer()
   server: Server;
-
-  async getFriends(userId: number) {
-    const observable = this.authService.send<FriendRequestEntity[]>(
-      { cmd: 'get-friends' },
-      { userId },
-    );
-
-    const friendRequests = await firstValueFrom(observable).catch((error) => {
-      console.error(error);
-    });
-
-    if (!friendRequests) return;
-
-    const friends = friendRequests.map((friendRequest: FriendRequestEntity) => {
-      const isCreator = userId === friendRequest.creator.id;
-      const friendDetail = isCreator
-        ? friendRequest.receiver
-        : friendRequest.creator;
-
-      const { id, firstName, lastName, email } = friendDetail;
-
-      return { id, firstName, lastName, email };
-    });
-
-    return friends;
-  }
 
   private async setActiveStatus(socket: Socket, isActive: boolean) {
     const user = socket.data?.user;
@@ -69,7 +45,7 @@ export class PresenceGateway
   }
 
   async emitStatusToFriends(activeUser: ActiveUser) {
-    const friends = await this.getFriends(activeUser.id);
+    const friends = await this.presenceService.getFriends(activeUser.id);
 
     if (!friends || !friends.length) return;
 

@@ -58,10 +58,11 @@ export class UserController {
   }
 
   @UseGuards(AuthGuard)
+  @UseInterceptors(UserInterceptor)
   @Get('presence')
-  async getPresence() {
+  async getPresence(@Req() req: UserRequest) {
     return this.presenceService
-      .send({ cmd: 'get-presence' }, {})
+      .send({ cmd: 'get-presence' }, { userId: req.user.id })
       .pipe(
         catchError((error) =>
           throwError(() => new RpcException(error.response)),
