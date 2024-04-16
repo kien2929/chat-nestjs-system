@@ -7,6 +7,7 @@ export class PresenceService {
   }
 
   getPresence() {
+    console.log('Not Cache');
     return 'Hello World!';
   }
 }
