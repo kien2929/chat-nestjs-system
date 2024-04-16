@@ -40,6 +40,8 @@ services:
     build:
       context: ./
       dockerfile: ./apps/presence/Dockerfile
+    ports:
+      - 6000:6000
     container_name: presence
     env_file:
       .env
