@@ -1,4 +1,4 @@
-import { UserEntity } from '@app/shared';
+import { FriendRequestEntity, UserEntity } from '@app/shared';
 import {
   CreateUserDto,
   LoginDto,
@@ -16,5 +16,6 @@ export interface AuthServiceInterface {
   verifyJwt(jwt: string): Promise<{ user: UserEntity; exp: number }>;
   findUserById(userId: number): Promise<UserEntity>;
   addFriend(userId: number, friendId: number);
-  getFriends(userId: number);
+  getFriends(userId: number): Promise<FriendRequestEntity[]>;
+  getFriendsList(userId: number);
 }

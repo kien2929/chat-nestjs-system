@@ -16,29 +16,17 @@ export class PresenceController {
   constructor(
     private readonly sharedService: SharedService,
     private readonly presenceService: PresenceService,
-    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
   ) {}
 
-  @MessagePattern({ cmd: 'get-presence' })
+  @MessagePattern({ cmd: 'get-active-user' })
   @UseInterceptors(CacheInterceptor)
   async getUser(
     @Ctx() context: RmqContext,
     @Payload() payload: { userId: number },
   ) {
-    const friends = await this.presenceService.getFriends(payload.userId);
-    const activeUsers = [];
-    console.log({ friends });
-    for (const friend of friends) {
-      // TODO: FIX IT
-      const activeUser = await this.cacheManager.get<ActiveUser>(
-        `user ${friend.id}`,
-      );
-      console.log({ activeUser });
-      if (!activeUser || !activeUser.isActive) continue;
-
-      activeUsers.push(activeUser);
-    }
-
+    const activeUsers = await this.presenceService.getActiveUser(
+      payload.userId,
+    );
     this.sharedService.acknowledgeMessage(context);
 
     return activeUsers;

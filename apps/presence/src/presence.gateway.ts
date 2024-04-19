@@ -45,7 +45,7 @@ export class PresenceGateway
   }
 
   async emitStatusToFriends(activeUser: ActiveUser) {
-    const friends = await this.presenceService.getFriends(activeUser.id);
+    const friends = await this.presenceService.getFriendsList(activeUser.id);
 
     if (!friends || !friends.length) return;
 

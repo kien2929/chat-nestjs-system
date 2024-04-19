@@ -59,7 +59,7 @@ export class UserController {
 
   @UseGuards(AuthGuard)
   @UseInterceptors(UserInterceptor)
-  @Get('presence')
+  @Get('get-active-user')
   async getPresence(@Req() req: UserRequest) {
     return this.presenceService
       .send({ cmd: 'get-presence' }, { userId: req.user.id })
