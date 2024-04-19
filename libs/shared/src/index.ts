@@ -9,14 +9,19 @@ export * from './services/redis.service';
 export * from './guards/auth.guard';
 // interface
 export * from './repositories/base/base.interface.repository';
-export * from './interfaces/user.repository';
-export * from './interfaces/friend-request.repository';
 export * from './interfaces/shared.service.interface';
 export * from './interfaces/user-jwt.interface';
 export * from './interfaces/user-request.interface';
+export * from './interfaces/user-request.interface';
+export * from './interfaces/repository/friend-request.repository';
+export * from './interfaces/repository/user.repository';
+export * from './interfaces/repository/conversation.repository';
+export * from './interfaces/repository/message.repository';
 // entities
 export * from './entities/user.entity';
 export * from './entities/friend-request.entity';
+export * from './entities/conversation.entity';
+export * from './entities/message.entity';
 // repository
 export * from './repositories/user.repository';
 export * from './repositories/friend-request.repository';
